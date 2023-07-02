@@ -1,13 +1,16 @@
 from django.db import IntegrityError
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
 from services.email_service import EmailMessage, CommonMatchMessage, send_all_mails
 from .serializers import ClientRegisterSerializer
 from .models import Client, ClientMatch
+from .filters import ClientFilter
 
 
 class CreationView(APIView):
@@ -54,3 +57,21 @@ class ClientMath(APIView):
             send_all_mails([message_to_request_client, message_to_matched_client])
 
         return Response(response)
+
+
+class ClientList(ListAPIView):
+    queryset = Client.objects.all()
+    serializer_class = ClientRegisterSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = ClientFilter
+
+    def get(self, request: Request, *args, **kwargs):
+        # Проверка, что пользователь указал параметр distance и он не авторизован
+        if 'distance' in request.query_params and not request.auth:
+            response = Response({'message': 'Filter by distance param only for authorized users'})
+            response.status_code = 404
+            return response
+        # Если пользователь авторизован убираем его из выборки
+        if request.auth:
+            self.queryset = self.queryset.exclude(id=request.user.id)
+        return super().get(request, *args, **kwargs)
