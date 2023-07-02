@@ -28,3 +28,14 @@ class Client(AbstractUser):
             self.avatar.file = WatermarkImage(self.avatar.file).get()
 
         return super().save(*args, **kwargs)
+
+
+class ClientMatch(models.Model):
+    """Модель для хранения симпатий пользователей"""
+
+    from_client_id = models.ForeignKey(to=Client, on_delete=models.CASCADE, related_name='from_user')
+    to_client_id = models.ForeignKey(to=Client, on_delete=models.CASCADE, related_name='to_user')
+    created_at = models.DateField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('from_client_id', 'to_client_id')
