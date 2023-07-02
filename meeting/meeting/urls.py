@@ -16,6 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from clients.views import CreationView
+from rest_framework.authtoken.views import ObtainAuthToken
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/client/create', CreationView().as_view()),
+    path('api/client/auth/', ObtainAuthToken().as_view()),
+
 ]
