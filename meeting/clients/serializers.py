@@ -5,10 +5,11 @@ from .models import Client
 
 class ClientRegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
+    id = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Client
-        fields = ('first_name', 'last_name', 'sex',
+        fields = ('id', 'first_name', 'last_name', 'sex',
                   'username', 'password', 'email', 'avatar',
                   'position_latitude', 'position_longitude')
 
