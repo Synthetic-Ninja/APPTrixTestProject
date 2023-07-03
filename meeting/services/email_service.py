@@ -1,5 +1,6 @@
-from django.core.mail import send_mail
 from abc import ABC, abstractmethod
+from .tasks import send_email_with_match
+from meeting.settings import EMAIL_HOST_USER
 
 
 class CommonMessage(ABC):
@@ -32,7 +33,7 @@ class CommonMatchMessage(CommonMessage):
 
 
 class EmailMessage:
-    FROM_EMAIL = 'Project@example.ru'
+    FROM_EMAIL = EMAIL_HOST_USER
 
     def __init__(self, message_recipient: str,
                  message_object: CommonMessage = None,
@@ -45,12 +46,12 @@ class EmailMessage:
             self.__parse_message_object(message_object)
 
     def send(self) -> None:
-        send_mail(subject=self.subject,
-                  message=self.message_text,
-                  from_email=self.FROM_EMAIL,
-                  recipient_list=self.message_recipient,
-                  fail_silently=False
-                  )
+        # Отправка сообщения с помощью celery
+        print('ok')
+        send_email_with_match.delay(subject=self.subject,
+                                    message_text=self.message_text,
+                                    from_email=self.FROM_EMAIL,
+                                    recipient_list=self.message_recipient)
 
     def __parse_message_object(self, message_object: CommonMessage) -> None:
         """Функция парсит объект CommonMessage"""
