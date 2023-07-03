@@ -23,8 +23,6 @@ class ClientFilter(filters.FilterSet):
                                                                      longitude=user.position_longitude,
                                                                      distance=distance)
 
-        print(min_max_latitude_longitude)
-
         queryset = queryset.filter(position_latitude__lte=min_max_latitude_longitude['max_latitude'],
                                    position_latitude__gte=min_max_latitude_longitude['min_latitude'],
                                    position_longitude__lte=min_max_latitude_longitude['max_longitude'],
