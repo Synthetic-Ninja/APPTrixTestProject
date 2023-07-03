@@ -3,13 +3,14 @@ import io
 from PIL import Image
 from django.core.files.base import File
 
-from meeting.settings import STATICFILES_DIRS
+from django.conf import settings
 
 
 class WatermarkImage:
     """Класс для добавления вотермарки на входную фотографию """
 
-    WATERMARK_PATH = f'{STATICFILES_DIRS[0]}/images/watermark.png'
+    WATERMARK_PATH = f'{settings.STATIC_ROOT if not settings.DEBUG else settings.STATICFILES_DIRS[0]}' \
+                     f'/images/watermark.png'
 
     def __init__(self, image: File, width=300, height=300):
         # Открываем изображения и приводим к нужному размеру
